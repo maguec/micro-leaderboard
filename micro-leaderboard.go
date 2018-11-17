@@ -36,6 +36,7 @@ func main() {
 	// Start routes
 	router.GET("/health", healthcheck.HealthCheck)
 	router.GET("/", app.Root)
+	router.GET("/api/:set/:member", app.IncrOne)
 
 	// RUN rabit run
 	router.Run() // listen and serve on 0.0.0.0:8080

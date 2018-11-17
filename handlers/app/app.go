@@ -27,3 +27,34 @@ func Root(c *gin.Context) {
 		"message": "This is root",
 	})
 }
+
+//IncrOne increments the leaderboard and returns current score
+func IncrOne(c *gin.Context) {
+	redisConn, ok := c.MustGet("redisConn").(*redis.Client)
+	if !ok {
+		c.JSON(500, gin.H{
+			"message": "Cannot get redisConn",
+		})
+	}
+	pipe := redisConn.Pipeline()
+	pipe.ZIncrBy(c.Param("set"), 1, c.Param("member"))
+	score := pipe.ZScore(c.Param("set"), c.Param("member"))
+	rank := pipe.ZRank(c.Param("set"), c.Param("member"))
+
+	_, err := pipe.Exec()
+
+	if err != nil {
+		c.JSON(500, gin.H{
+			"message": "Pipe failed:",
+			"error":   err,
+		})
+	} else {
+		c.JSON(200, gin.H{
+			"message": "OK",
+			"board":   c.Param("set"),
+			"member":  c.Param("member"),
+			"score":   score.Val(),
+			"rank":    rank.Val(),
+		})
+	}
+}
