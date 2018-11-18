@@ -22,14 +22,13 @@ func Root(c *gin.Context) {
 			"message": "Cannot get redisConn",
 		})
 	}
-	pong, err := redisConn.Ping().Result()
+	_, err := redisConn.Ping().Result()
 	if err != nil {
 		c.JSON(500, gin.H{
 			"message": "Cannot ping Redis:",
 			"error":   err,
 		})
 	}
-	fmt.Println(pong, err)
 	c.JSON(200, gin.H{
 		"message": "This is root",
 	})
