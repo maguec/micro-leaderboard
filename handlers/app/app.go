@@ -1,7 +1,6 @@
 package app
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -128,7 +127,6 @@ func ShowBoard(c *gin.Context) {
 	}
 
 	board := redisConn.ZRevRangeWithScores(c.Param("set"), 0, entryCount)
-	fmt.Println(board)
 
 	if board.Err() != nil {
 		c.JSON(500, gin.H{
