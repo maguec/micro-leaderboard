@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
@@ -28,19 +29,33 @@ func Root(c *gin.Context) {
 	})
 }
 
-//IncrOne increments the leaderboard and returns current score
-func IncrOne(c *gin.Context) {
+//Incr increments the leaderboard and returns current score
+func Incr(c *gin.Context) {
+	var incby float64
+	s, p := strconv.ParseFloat(c.Param("count"), 64)
+	if p == nil {
+		incby = s
+	} else {
+		incby = 1
+	}
 	redisConn, ok := c.MustGet("redisConn").(*redis.Client)
 	if !ok {
 		c.JSON(500, gin.H{
 			"message": "Cannot get redisConn",
 		})
 	}
+
+	incErr := redisConn.ZIncrBy(c.Param("set"), incby, c.Param("member")).Err()
+	if incErr != nil {
+		c.JSON(500, gin.H{
+			"message": "Unable to set",
+			"error":   incErr,
+		})
+	}
+
 	pipe := redisConn.Pipeline()
-	pipe.ZIncrBy(c.Param("set"), 1, c.Param("member"))
 	score := pipe.ZScore(c.Param("set"), c.Param("member"))
 	rank := pipe.ZRank(c.Param("set"), c.Param("member"))
-
 	_, err := pipe.Exec()
 
 	if err != nil {
