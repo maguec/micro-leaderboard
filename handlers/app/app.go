@@ -78,16 +78,15 @@ func Incr(c *gin.Context) {
 		})
 	} else {
 		c.JSON(200, gin.H{
-			"message": "OK",
-			"board":   c.Param("set"),
-			"member":  c.Param("member"),
-			"score":   m.score,
-			"rank":    m.rank,
+			"board":  c.Param("set"),
+			"member": c.Param("member"),
+			"score":  m.score,
+			"rank":   m.rank,
 		})
 	}
 }
 
-//GetRank
+//GetRank for a member of a set
 func GetRank(c *gin.Context) {
 	redisConn, ok := c.MustGet("redisConn").(*redis.Client)
 	if !ok {
@@ -105,11 +104,42 @@ func GetRank(c *gin.Context) {
 		})
 	} else {
 		c.JSON(200, gin.H{
-			"message": "OK",
+			"board":  c.Param("set"),
+			"member": c.Param("member"),
+			"score":  m.score,
+			"rank":   m.rank,
+		})
+	}
+}
+
+//ShowBoard returns the leaderboard as a JSON object
+func ShowBoard(c *gin.Context) {
+	var entryCount int64
+	s, p := strconv.ParseInt(c.Param("count"), 10, 64)
+	if p == nil {
+		entryCount = s - 1
+	} else {
+		entryCount = -1
+	}
+	redisConn, ok := c.MustGet("redisConn").(*redis.Client)
+	if !ok {
+		c.JSON(500, gin.H{
+			"message": "Cannot get redisConn",
+		})
+	}
+
+	board := redisConn.ZRevRangeWithScores(c.Param("set"), 0, entryCount)
+	fmt.Println(board)
+
+	if board.Err() != nil {
+		c.JSON(500, gin.H{
+			"message": "Board fetch failed:",
+			"error":   board.Err(),
+		})
+	} else {
+		c.JSON(200, gin.H{
 			"board":   c.Param("set"),
-			"member":  c.Param("member"),
-			"score":   m.score,
-			"rank":    m.rank,
+			"leaders": board.Val(),
 		})
 	}
 }

@@ -39,7 +39,8 @@ func main() {
 	router.GET("/inc/:set/:member", app.Incr)
 	router.GET("/inc/:set/:member/:count", app.Incr)
 	router.GET("/member/:set/:member", app.GetRank)
-	//router.GET("/board/:set", app.ShowBoard)
+	router.GET("/board/:set", app.ShowBoard)
+	router.GET("/board/:set/:count", app.ShowBoard)
 
 	// RUN rabit run
 	router.Run() // listen and serve on 0.0.0.0:8080
