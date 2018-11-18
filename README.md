@@ -2,6 +2,40 @@
 
 Leader board microservice written in Go/Gin using redis
 
+## Usage
+
+This is meant to be a fast and efficient microservice to create a leaderboard.
+
+
+### Memory Usage
+The leaderboard is stored in Redis using a sorted set which is very fast an easy on memory
+
+You can see that 995K entries only use about about 20 mb of memory
+```
+127.0.0.1:6379>  zcount testset -inf +inf
+(integer) 995128
+127.0.0.1:6379> debug object testset
+Value at:0x7f993c466850 refcount:1 encoding:skiplist serializedlength:19791998 lru:15849160 lru_seconds_idle:8
+```
+
+### Latency
+
+Using the [wrk](https://github.com/wg/wrk) benchmarking tool and a script to randomly generate entries on an already populated sorted set we get the following results *without any OS or redis tuning* on my 4 core desktop.
+
+```
+$ wrk -c 100 -t 20 -d 30s -s testing/random-user.lua http://localhost:8080
+Running 30s test @ http://localhost:8080
+  20 threads and 100 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     5.07ms    1.99ms  38.57ms   79.54%
+    Req/Sec     1.00k   101.67     1.17k    90.58%
+  597811 requests in 30.03s, 109.20MB read
+Requests/sec:  19910.25
+Transfer/sec:      3.64MB
+```
+
+For information on [tuning redis for prodution](http://shokunin.co/blog/2014/11/11/operational_redis.html) see my guide that while dated is still accurate.
+
 ## Building
 
 ### Mac/Linux
