@@ -38,7 +38,7 @@ func main() {
 	router.GET("/", app.Root)
 	router.GET("/inc/:set/:member", app.Incr)
 	router.GET("/inc/:set/:member/:count", app.Incr)
-	//router.GET("/member/:set/:member", app.GetRank)
+	router.GET("/member/:set/:member", app.GetRank)
 	//router.GET("/board/:set", app.ShowBoard)
 
 	// RUN rabit run
