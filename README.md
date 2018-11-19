@@ -81,7 +81,7 @@ $ curl -s localhost:8080/member/myleaderboard/Alex |jq
 {
   "board": "myleaderboard",
   "member": "Alex",
-  "rank": 1,
+  "rank": 3,
   "score": 2
 }
 ```

@@ -26,7 +26,7 @@ func getrank(redisConn *redis.Client, set string, member string) (rank MemberRan
 	mscore := pipe.ZScore(set, member)
 	mrank := pipe.ZRevRank(set, member)
 	_, rerr = pipe.Exec()
-	rank = MemberRank{rank: mrank.Val(), score: mscore.Val()}
+	rank = MemberRank{rank: mrank.Val() + 1, score: mscore.Val()}
 	return
 }
 
