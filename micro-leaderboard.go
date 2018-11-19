@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -21,9 +23,23 @@ func APIMiddleware(r *redis.Client) gin.HandlerFunc {
 
 func main() {
 	router := gin.New()
+	var redisHost string
+	var redisPort string
+
+	if len(os.Getenv("REDIS_HOST")) > 0 {
+		redisHost = os.Getenv("REDIS_HOST")
+	} else {
+		redisHost = "localhost"
+	}
+
+	if len(os.Getenv("REDIS_PORT")) > 0 {
+		redisPort = os.Getenv("REDIS_PORT")
+	} else {
+		redisPort = "6379"
+	}
 
 	rClient := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
+		Addr:     fmt.Sprintf("%s:%s", redisHost, redisPort),
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
