@@ -53,6 +53,59 @@ For information on [tuning redis for prodution](http://shokunin.co/blog/2014/11/
 
 ## Running
 
+### Routes
+```
+GET   /health                   --> Health Check
+GET   /                         --> Fake root handler
+GET   /inc/:set/:member         --> Increment the leaderboard for a member
+GET   /inc/:set/:member/:count  --> Increment the leaderboard for a member by a specific count
+GET   /member/:set/:member      --> Get Information for a member of the leaderboard
+GET   /board/:set               --> Get the Full leaderboard returned - not really advisable
+GET   /board/:set/:count        --> Get the Top X entries from the leaderboard
+```
+
+### Example Usage
+
+#### Load Data:
+```
+curl -s localhost:8080/inc/myleaderboard/Reiko/7
+curl -s localhost:8080/inc/myleaderboard/Alex/2
+curl -s localhost:8080/inc/myleaderboard/Chris/3
+curl -s localhost:8080/inc/myleaderboard/Sean
+```
+
+#### Get Alex's ranking
+
+```
+$ curl -s localhost:8080/member/myleaderboard/Alex |jq
+{
+  "board": "myleaderboard",
+  "member": "Alex",
+  "rank": 1,
+  "score": 2
+}
+```
+
+### Get the top 2 
+
+```
+$ curl -s localhost:8080/board/myleaderboard/2 |jq
+{
+  "board": "myleaderboard",
+  "leaders": [
+    {
+      "Score": 7,
+      "Member": "Reiko"
+    },
+    {
+      "Score": 3,
+      "Member": "Chris"
+    }
+  ]
+}
+```
+
+
 ### Mac/Linux
 
 ```
@@ -63,7 +116,8 @@ For information on [tuning redis for prodution](http://shokunin.co/blog/2014/11/
 
 ```
 docker pull maguec/micro-leaderboard:latest
-docker run -i -t -p 8080:8080 maguec/micro-leaderboard
+docker run --rm -p 6379:6379 --name myredis redis
+docker run --rm -i -t -p 8080:8080 -e REDIS_HOST=redis -e REDIS_PORT=6379 --link myredis:redis maguec/micro-leaderboard
 ```
 
 ## Testing
