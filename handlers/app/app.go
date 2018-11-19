@@ -15,21 +15,8 @@ type MemberRank struct {
 
 //Root just make sure we can hits the redis
 func Root(c *gin.Context) {
-	redisConn, ok := c.MustGet("redisConn").(*redis.Client)
-	if !ok {
-		c.JSON(500, gin.H{
-			"message": "Cannot get redisConn",
-		})
-	}
-	_, err := redisConn.Ping().Result()
-	if err != nil {
-		c.JSON(500, gin.H{
-			"message": "Cannot ping Redis:",
-			"error":   err,
-		})
-	}
 	c.JSON(200, gin.H{
-		"message": "This is root",
+		"message": "This is root - Please see the docs",
 	})
 }
 
@@ -37,7 +24,7 @@ func getrank(redisConn *redis.Client, set string, member string) (rank MemberRan
 
 	pipe := redisConn.Pipeline()
 	mscore := pipe.ZScore(set, member)
-	mrank := pipe.ZRank(set, member)
+	mrank := pipe.ZRevRank(set, member)
 	_, rerr = pipe.Exec()
 	rank = MemberRank{rank: mrank.Val(), score: mscore.Val()}
 	return
