@@ -25,6 +25,7 @@ func main() {
 	router := gin.New()
 	var redisHost string
 	var redisPort string
+	var listenPort string
 
 	if len(os.Getenv("REDIS_HOST")) > 0 {
 		redisHost = os.Getenv("REDIS_HOST")
@@ -36,6 +37,12 @@ func main() {
 		redisPort = os.Getenv("REDIS_PORT")
 	} else {
 		redisPort = "6379"
+	}
+
+	if len(os.Getenv("LISTEN_PORT")) > 0 {
+		listenPort = os.Getenv("LISTEN_PORT")
+	} else {
+		listenPort = "8080"
 	}
 
 	rClient := redis.NewClient(&redis.Options{
@@ -59,5 +66,5 @@ func main() {
 	router.GET("/board/:set/:count", app.ShowBoard)
 
 	// RUN rabit run
-	router.Run() // listen and serve on 0.0.0.0:8080
+	router.Run(fmt.Sprintf(":%s", listenPort)) // listen and serve on 0.0.0.0:8080
 }

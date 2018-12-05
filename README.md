@@ -117,8 +117,13 @@ $ curl -s localhost:8080/board/myleaderboard/2 |jq
 ```
 docker pull maguec/micro-leaderboard:latest
 docker run --rm -p 6379:6379 --name myredis redis
-docker run --rm -i -t -p 8080:8080 -e REDIS_HOST=redis -e REDIS_PORT=6379 --link myredis:redis maguec/micro-leaderboard
+docker run --rm -i -t -p 8080:8080 -e LISTEN_PORT=8080 -e REDIS_HOST=redis -e REDIS_PORT=6379 --link myredis:redis maguec/micro-leaderboard
 ```
+
+The following settings can be passed in via environment variables:
+LISTEN_PORT - HTTP port to listen on - defaults to 8080
+REDIS_HOST  - Hostname or IP of the Redis server  - defaults to localhost
+REDIS_PORT  - Hostname or IP of the Redis server - defaults to 6379
 
 ## Testing
 
